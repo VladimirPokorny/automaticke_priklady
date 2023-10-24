@@ -1,78 +1,100 @@
-from PySide6 import QtWidgets, QtGui, QtCore
-from widgets import central_widget, main_area, toolbar_manager
-from widgets.views import text_view	
-from widgets.toolbars import example_configuration
-
 import sys
+from PySide6.QtWidgets import QApplication, QMainWindow, QSplitter, QVBoxLayout, QPushButton, QWidget
+from PySide6 import QtWidgets, QtGui
+from PySide6.QtCore import Qt
 
-
-class MainWindow(QtWidgets.QMainWindow):
-    """
-    Main window of the application.
-    """
+class MainApp(QMainWindow):
     def __init__(self):
-        """
-        Initialize the main window.
-        """
         super().__init__()
 
-        self.absolute_widget = {}
+        self.setWindowTitle("Addition generator")
+        self.setGeometry(100, 100, 800, 600)
 
-        self.board_num = 0
-        self.channel = 0
-        self.measured_range = 10
-        self.connected = False
+        # Create a central widget
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
 
-        self.timer_value = 1000
-        self.timer = QtCore.QTimer()
+        # Create a splitter to divide the window into left and right areas
+        splitter = QSplitter()
+        central_widget.setLayout(QVBoxLayout())
+        central_widget.layout().addWidget(splitter)
 
-        self.setWindowTitle('EDX sensor temperature')
-        self.setGeometry(50, 50, 1200, 800)
+        # Create the left panel (Settings)
+        left_panel = QWidget()
+        left_layout = QVBoxLayout()
+        left_panel.setLayout(left_layout)
 
-        self.setStyleSheet(open('style/style.qss', 'r').read())
+        range = QtWidgets.QGroupBox("Range")
+        range_layout = QtWidgets.QVBoxLayout()
+        range.setLayout(range_layout)
 
-        self.menu_bar = self.menuBar()
-        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
-        self.menu_bar.setStyleSheet('padding:5px 0px;')
+        range_from_widget = QtWidgets.QWidget()
+        range_from_layout = QtWidgets.QHBoxLayout()
+        range_from_widget.setLayout(range_from_layout)
 
-        self.file_submenu = self.menu_bar.addMenu('&File')
-        reconnect_action = QtGui.QAction('Reconnect', self.file_submenu)
-        reconnect_action.triggered.connect(self.adc_init)
-        self.file_submenu.addAction(reconnect_action)
+        range_from_label = QtWidgets.QLabel("From: ")
+        range_from = QtWidgets.QSpinBox()
+        range_from.setValue(0)
+        range_from_layout.addWidget(range_from_label)
+        range_from_layout.addWidget(range_from)
 
-        self.setCentralWidget(QtWidgets.QWidget())
-        self.centralWidget().setMouseTracking(True)
-        self.centralWidget().setMinimumSize(500, 400)
+        range_to_widget = QtWidgets.QWidget()
+        range_to_layout = QtWidgets.QHBoxLayout()
+        range_to_widget.setLayout(range_to_layout)
 
-        self.centralWidget().setLayout(QtWidgets.QVBoxLayout())
-        self.centralWidget().layout().setSpacing(0)
-        self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
-
-        self.survey_central_widget = central_widget.CentralWidget(self)
-        self.centralWidget().layout().addWidget(self.survey_central_widget)
-
-        self.graph_view = text_view.TextView()
-
-
-        self.main_area = main_area.MainArea(self.graph_view)
-        self.main_area.setFixedHeight(self.survey_central_widget.size().height())
-        self.main_area.setParent(self.survey_central_widget)
-
-        self.survey_central_widget.register_absolute_widget('main_area', self.main_area)
-        self.left_toolbars = self.survey_central_widget.register_absolute_widget('left_toolbars', 
-            toolbar_manager.ToolbarManager(self.survey_central_widget, 'left'))
-
-        self.data_capturing = self.left_toolbars.addToolbar(example_configuration.ExampleConfiguration(self))
-        # self.file_processing = self.left_toolbars.addToolbar(file_processing.FileProcessing(self))
-        # self.recording_information = self.left_toolbars.addToolbar(recording_information.RecordingInformation(self))
-        # self.device_configuration = self.left_toolbars.addToolbar(device_configuration.DeviceConfiguration(self))
-
-    def adc_init(self):
-        pass
+        range_to_label = QtWidgets.QLabel("To: ")
+        range_to = QtWidgets.QSpinBox()
+        range_to.setValue(30)
+        range_to_layout.addWidget(range_to_label)
+        range_to_layout.addWidget(range_to)
+        
+        range_layout.addWidget(range_from_widget)
+        range_layout.addWidget(range_to_widget)
 
 
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    gui = MainWindow()
-    gui.showMaximized()
+
+        setting_addition = QtWidgets.QGroupBox("Addition")
+        setting_addition_layout = QtWidgets.QVBoxLayout()
+        setting_addition.setLayout(setting_addition_layout)
+
+        setting_addition_enable = QtWidgets.QWidget()
+        setting_addition_enable_layout = QtWidgets.QHBoxLayout()
+
+
+
+
+
+
+        verticalSpacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+
+        left_layout.addWidget(range)
+        left_layout.addItem(verticalSpacer)
+
+
+        # Create the main content (Right panel)
+        main_area = QtWidgets.QWidget()
+        main_layout = QVBoxLayout()
+        main_area.setLayout(main_layout)
+
+        text_edit = QtWidgets.QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setText("There will be the generated addition tasks")
+
+        main_layout.addWidget(text_edit)
+
+        # Add the left panel and main content widgets to the splitter
+        splitter.addWidget(left_panel)
+        splitter.addWidget(main_area)
+
+        # Set the size policy for the splitter handle to make the left panel 30% of the screen width
+        splitter.setSizes([int(self.width() * 0.2), int(self.width() * 0.8)])
+        splitter.setHandleWidth(1)
+
+def main():
+    app = QApplication(sys.argv)
+    window = MainApp()
+    window.show()
     sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()
