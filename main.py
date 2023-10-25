@@ -1,78 +1,64 @@
-from PySide6 import QtWidgets, QtGui, QtCore
-from widgets import central_widget, main_area, toolbar_manager
-from widgets.views import text_view	
-from widgets.toolbars import example_configuration
-
 import sys
+from PySide6 import QtWidgets
+from widgets import splitter, group_box, output_editor
+from example_generator import example_generator
 
 
-class MainWindow(QtWidgets.QMainWindow):
-    """
-    Main window of the application.
-    """
+class MainApp(QtWidgets.QMainWindow):
     def __init__(self):
-        """
-        Initialize the main window.
-        """
         super().__init__()
 
-        self.absolute_widget = {}
+        self.setWindowTitle("Addition generator")
+        self.setGeometry(100, 100, 800, 600)
 
-        self.board_num = 0
-        self.channel = 0
-        self.measured_range = 10
-        self.connected = False
+        self.addition_configuration = example_generator.AdditionConfiguration()
+        self.subtraction_configuration = example_generator.SubtractionConfiguration()
+        self.example_configuration = example_generator.ExampleConfiguration()
+        self.generator = example_generator.Generator(self.example_configuration, 
+                                                     self.addition_configuration, 
+                                                     self.subtraction_configuration,
+                                                     parent=self)
 
-        self.timer_value = 1000
-        self.timer = QtCore.QTimer()
+        self.central_widget = QtWidgets.QWidget(self)
+        self.setCentralWidget(self.central_widget)
+        self.central_widget.setLayout(QtWidgets.QVBoxLayout())
 
-        self.setWindowTitle('EDX sensor temperature')
-        self.setGeometry(50, 50, 1200, 800)
+        self.left_panel = QtWidgets.QWidget()
+        self.left_layout = QtWidgets.QVBoxLayout()
+        self.left_panel.setLayout(self.left_layout)
 
-        self.setStyleSheet(open('style/style.qss', 'r').read())
+        self.range_group_box = group_box.RangeGroupBox([0, 50], [0, 50], parent=self)
+        self.range_group_box.update_configuration()
+        self.left_layout.addWidget(self.range_group_box)
 
-        self.menu_bar = self.menuBar()
-        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
-        self.menu_bar.setStyleSheet('padding:5px 0px;')
+        self.example_generator_box = group_box.ExampleGeneratorBox(parent=self)
+        self.example_generator_box.update_configuration()
+        self.left_layout.addWidget(self.example_generator_box)
 
-        self.file_submenu = self.menu_bar.addMenu('&File')
-        reconnect_action = QtGui.QAction('Reconnect', self.file_submenu)
-        reconnect_action.triggered.connect(self.adc_init)
-        self.file_submenu.addAction(reconnect_action)
+        self.generator_button = QtWidgets.QPushButton('Generate', self)
+        self.generator_button.clicked.connect(self.generator.generate_and_update_view)
+        self.left_layout.addWidget(self.generator_button)
 
-        self.setCentralWidget(QtWidgets.QWidget())
-        self.centralWidget().setMouseTracking(True)
-        self.centralWidget().setMinimumSize(500, 400)
+        verticalSpacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.left_layout.addItem(verticalSpacer)
 
-        self.centralWidget().setLayout(QtWidgets.QVBoxLayout())
-        self.centralWidget().layout().setSpacing(0)
-        self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
+        self.main_area = QtWidgets.QWidget()
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_area.setLayout(self.main_layout)
 
-        self.survey_central_widget = central_widget.CentralWidget(self)
-        self.centralWidget().layout().addWidget(self.survey_central_widget)
+        self.text_edit = output_editor.OutputTextEdit(parent=self)
+        self.main_layout.addWidget(self.text_edit)       
 
-        self.graph_view = text_view.TextView()
-
-
-        self.main_area = main_area.MainArea(self.graph_view)
-        self.main_area.setFixedHeight(self.survey_central_widget.size().height())
-        self.main_area.setParent(self.survey_central_widget)
-
-        self.survey_central_widget.register_absolute_widget('main_area', self.main_area)
-        self.left_toolbars = self.survey_central_widget.register_absolute_widget('left_toolbars', 
-            toolbar_manager.ToolbarManager(self.survey_central_widget, 'left'))
-
-        self.data_capturing = self.left_toolbars.addToolbar(example_configuration.ExampleConfiguration(self))
-        # self.file_processing = self.left_toolbars.addToolbar(file_processing.FileProcessing(self))
-        # self.recording_information = self.left_toolbars.addToolbar(recording_information.RecordingInformation(self))
-        # self.device_configuration = self.left_toolbars.addToolbar(device_configuration.DeviceConfiguration(self))
-
-    def adc_init(self):
-        pass
+        self.splitter = splitter.Splitter(self.left_panel, self.main_area, parent=self)
+        self.central_widget.layout().addWidget(self.splitter)
 
 
-if __name__ == '__main__':
+def main():
     app = QtWidgets.QApplication(sys.argv)
-    gui = MainWindow()
-    gui.showMaximized()
+    window = MainApp()
+    window.show()
     sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
