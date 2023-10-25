@@ -1,1 +1,1 @@
-import example_generator
+from . import example_generator
