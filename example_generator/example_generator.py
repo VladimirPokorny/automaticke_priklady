@@ -1,11 +1,6 @@
 import numpy as np
 
 
-class ExampleGenerator:
-    def __init__(self) -> None:
-        pass
-
-
 class AdditionGenerator():
     def __init__(self):
         self.configuration = {
