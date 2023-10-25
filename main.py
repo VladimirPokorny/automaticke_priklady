@@ -32,46 +32,6 @@ class MainApp(QMainWindow):
         central_widget.setLayout(QVBoxLayout())
         central_widget.layout().addWidget(self.splitter)
 
-        # Create the left panel (Settings)
-
-
-        # range = QtWidgets.QGroupBox("Range")
-        # range_layout = QtWidgets.QVBoxLayout()
-        # range.setLayout(range_layout)
-
-        # range_from_widget = QtWidgets.QWidget()
-        # range_from_layout = QtWidgets.QHBoxLayout()
-        # range_from_widget.setLayout(range_from_layout)
-
-        # range_from_label = QtWidgets.QLabel("From: ")
-        # range_from = QtWidgets.QSpinBox()
-        # range_from.setValue(0)
-        # range_from_layout.addWidget(range_from_label)
-        # range_from_layout.addWidget(range_from)
-
-        # range_to_widget = QtWidgets.QWidget()
-        # range_to_layout = QtWidgets.QHBoxLayout()
-        # range_to_widget.setLayout(range_to_layout)
-
-        # range_to_label = QtWidgets.QLabel("To: ")
-        # range_to = QtWidgets.QSpinBox()
-        # range_to.setValue(30)
-        # range_to_layout.addWidget(range_to_label)
-        # range_to_layout.addWidget(range_to)
-        
-        # range_layout.addWidget(range_from_widget)
-        # range_layout.addWidget(range_to_widget)
-
-
-
-        # setting_addition = QtWidgets.QGroupBox("Addition")
-        # setting_addition_layout = QtWidgets.QVBoxLayout()
-        # setting_addition.setLayout(setting_addition_layout)
-
-        # setting_addition_enable = QtWidgets.QWidget()
-        # setting_addition_enable_layout = QtWidgets.QHBoxLayout()
-
-
 
 
 
